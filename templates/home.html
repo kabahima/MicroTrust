@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroTrust </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background */
+        }
+
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-form {
+            width: 400px; /* Adjust width as needed */
+        }
+
+        .login-left {
+            background-image: url('{% static "coverpage.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 30px;
+            text-align: left;
+        }
+
+        .login-right {
+            padding: 30px;
+            border: 1px solid #dee2e6; /* Light border */
+            border-radius: 5px;
+        }
+
+        .mifos-logo {
+            width: 150px; /* Adjust size as needed */
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border-radius: 0; /* Remove rounded corners */
+        }
+
+        .btn-primary {
+            background-color: #6c757d; /* Grey button */
+            border-color: #6c757d;
+            border-radius: 0;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a6268; /* Darker grey on hover */
+            border-color: #545b62;
+        }
+
+        .form-group i {
+            margin-right: 5px;
+        }
+        .asterisk {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container login-container">
+        <div class="row">
+            <div class="col-md-6 login-left">
+                <h1>MicroTrust x</h1>
+                <p>
+                    MicroTrust is an open-source SACCO and financial management system designed to help cooperatives, microfinance institutions, and community savings groups streamline operations. With secure account management, loan tracking, mobile payments, and real-time reporting, MicroTrust empowers financial inclusion and trust-driven growth.
+                </p>
+            </div>
+
+            <div class="col-md-6 login-right">
+                <img src="{% static 'logo.jpg' %}" alt="MicroTrust Logo" class="mifos-logo">
+                <form method="POST" class="login-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username"><i class="fas fa-user"></i> Username <span class="asterisk">*</span></label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> Password <span class="asterisk">*</span></label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+
+                    <a href="#">Forgot Password?</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
