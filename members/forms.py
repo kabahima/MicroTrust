@@ -1,11 +1,13 @@
-# members/forms.py
+# forms.py
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Member
+from .models import Member, NextOfKin
 
-class MemberRegistrationForm(UserCreationForm):
-    profile_picture = forms.ImageField(required=False)
-
+class MemberForm(forms.ModelForm):
     class Meta:
         model = Member
-        fields = ['username', 'email', 'phone_number', 'national_id', 'address', 'profile_picture', 'password1', 'password2']
+        fields = ['username', 'phone_number', 'national_id', 'address', 'profile_picture', 'is_approved']
+
+class NextOfKinForm(forms.ModelForm):
+    class Meta:
+        model = NextOfKin
+        fields = ['name', 'relationship', 'phone_number', 'address', 'zone', 'subcounty', 'parish', 'district', 'occupation']

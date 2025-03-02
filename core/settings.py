@@ -3,6 +3,13 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+# Add this near the top of the file, after imports
+cloudinary.config( 
+  cloud_name = "dgkohtwix", 
+  api_key = "182524473781918", 
+  api_secret = "udV9dubqDNy85tPMt8YZTRmcLd8"
+)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,9 +34,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'members',
     'crispy_forms',
+    'accounts',
+    'loans',
+    'transactions',
 ]
 
 MIDDLEWARE = [
@@ -75,10 +87,12 @@ DATABASES = {
 
 
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": "your_cloud_name",
-    "API_KEY": "your_api_key",
-    "API_SECRET": "your_api_secret",
+    "CLOUD_NAME": "dgkohtwix",
+    "API_KEY": "182524473781918",
+    "API_SECRET": "udV9dubqDNy85tPMt8YZTRmcLd8",
 }
+
+# CLOUDINARY_URL="cloudinary://182524473781918:udV9dubqDNy85tPMt8YZTRmcLd8@dgkohtwix"
 
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 

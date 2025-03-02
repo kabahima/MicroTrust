@@ -1,0 +1,28 @@
+<!-- member_form.html -->
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <div class="next-of-kin-fields">
+        <h3>Next of Kin</h3>
+        <div class="next-of-kin">
+            <label for="next_of_kin_name">Name:</label>
+            <input type="text" name="next_of_kin_name" required>
+
+            <label for="next_of_kin_relationship_0">Relationship:</label>
+            <input type="text" name="next_of_kin_relationship_0">
+
+            <label for="next_of_kin_phone_number_0">Phone Number:</label>
+            <input type="text" name="next_of_kin_phone_number_0">
+
+            <label for="next_of_kin_address_0">Address:</label>
+            <textarea name="next_of_kin_address_0"></textarea>
+
+            <!-- Add more fields as needed -->
+
+            <button type="button" class="add-next-of-kin">Add another Next of Kin</button>
+        </div>
+    </div>
+    
+    <button type="submit">Save</button>
+</form>
