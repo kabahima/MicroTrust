@@ -16,10 +16,13 @@ class Account(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
     account_type = models.ForeignKey(AccountType, on_delete=models.SET_NULL, null=True, related_name="accounts")
+    balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    shares_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} ({self.account_type.name}) - {self.account_number}"
+        return f"{self.name} ({self.account_type.name if self.account_type else 'No Type'}) - {self.account_number}"
 
     def save(self, *args, **kwargs):
         if not self.account_number:
@@ -28,7 +31,6 @@ class Account(models.Model):
 
     def generate_account_number(self):
         """Generate a unique 12-digit account number."""
-        account_number = random.randint(100000000000, 999999999999)
-        while Account.objects.filter(account_number=account_number).exists():
-            account_number = random.randint(100000000000, 999999999999)
-        return str(account_number)
+        import uuid
+        # Use UUID for better uniqueness
+        return str(uuid.uuid4().int)[:12]

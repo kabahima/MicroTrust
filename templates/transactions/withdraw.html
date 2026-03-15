@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Withdraw - MicroTrust{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-minus-circle me-2"></i>Make a Withdrawal
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <!-- Account Info -->
+                <div class="alert alert-info">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Account Number:</strong> {{ user.account_number }}<br>
+                            <strong>Account Holder:</strong> {{ user.get_full_name|default:user.username }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Available Balance:</strong> ${{ user.accounts.first.balance|default:"0.00" }}<br>
+                            <strong>Account Status:</strong> 
+                            {% if user.is_approved %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending Approval</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if not user.is_approved %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Your account is pending approval. Transactions may be restricted.
+                </div>
+                {% endif %}
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="amount" class="form-label">
+                                <i class="fas fa-dollar-sign me-2"></i>Withdrawal Amount *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="amount" name="amount" 
+                                       step="0.01" min="0.01" max="{{ user.accounts.first.balance|default:'0' }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid amount within your available balance.
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                Maximum withdrawal: ${{ user.accounts.first.balance|default:"0.00" }}
+                            </small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="withdrawal_method" class="form-label">
+                                <i class="fas fa-credit-card me-2"></i>Withdrawal Method
+                            </label>
+                            <select class="form-select" id="withdrawal_method" name="withdrawal_method">
+                                <option value="cash">Cash</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="mobile_money">Mobile Money</option>
+                                <option value="check">Check</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-comment me-2"></i>Purpose/Description (Optional)
+                        </label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="3" placeholder="Enter withdrawal purpose or notes..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Transaction Summary</h6>
+                                    <p class="mb-1"><strong>Withdrawal Amount:</strong> $<span id="summary-amount">0.00</span></p>
+                                    <p class="mb-1"><strong>Current Balance:</strong> ${{ user.accounts.first.balance|default:"0.00" }}</p>
+                                    <p class="mb-0"><strong>Remaining Balance:</strong> $<span id="remaining-balance">{{ user.accounts.first.balance|default:"0.00" }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success btn-lg" id="withdraw-btn">
+                                    <i class="fas fa-minus-circle me-2"></i>Process Withdrawal
+                                </button>
+                                <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Withdrawals -->
+        <div class="card shadow mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Recent Withdrawals
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for withdrawal in user.accounts.first.withdrawals.all|slice:":5" %}
+                            <tr>
+                                <td>{{ withdrawal.date|date:"M d, Y H:i" }}</td>
+                                <td>${{ withdrawal.amount }}</td>
+                                <td>{{ withdrawal.description|default:"-" }}</td>
+                                <td><span class="badge bg-success">Completed</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    No recent withdrawals found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.getElementById('amount');
+    const summaryAmount = document.getElementById('summary-amount');
+    const remainingBalance = document.getElementById('remaining-balance');
+    const withdrawBtn = document.getElementById('withdraw-btn');
+    const currentBalance = {{ user.accounts.first.balance|default:"0.00" }};
+
+    amountInput.addEventListener('input', function() {
+        const amount = parseFloat(this.value) || 0;
+        summaryAmount.textContent = amount.toFixed(2);
+        const remaining = currentBalance - amount;
+        remainingBalance.textContent = remaining.toFixed(2);
+        
+        // Disable button if insufficient funds
+        if (amount > currentBalance) {
+            withdrawBtn.disabled = true;
+            withdrawBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Insufficient Funds';
+            remainingBalance.style.color = 'red';
+        } else {
+            withdrawBtn.disabled = false;
+            withdrawBtn.innerHTML = '<i class="fas fa-minus-circle me-2"></i>Process Withdrawal';
+            remainingBalance.style.color = '';
+        }
+    });
+
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %}

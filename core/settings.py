@@ -1,29 +1,30 @@
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-# Add this near the top of the file, after imports
-cloudinary.config( 
-  cloud_name = "dgkohtwix", 
-  api_key = "182524473781918", 
-  api_secret = "udV9dubqDNy85tPMt8YZTRmcLd8"
-)
+# Load environment variables
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#pi$uroj^ti-*s34=@zn-hv@fc!7@_muvj#p-5gj!c-b1tyn^2'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-#pi$uroj^ti-*s34=@zn-hv@fc!7@_muvj#p-5gj!c-b1tyn^2')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_HOSTS') else []
+
+# Cloudinary configuration
+cloudinary.config( 
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+)
 
 
 # Application definition
@@ -87,9 +88,9 @@ DATABASES = {
 
 
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": "dgkohtwix",
-    "API_KEY": "182524473781918",
-    "API_SECRET": "udV9dubqDNy85tPMt8YZTRmcLd8",
+    "CLOUD_NAME": os.getenv('CLOUDINARY_CLOUD_NAME'),
+    "API_KEY": os.getenv('CLOUDINARY_API_KEY'),
+    "API_SECRET": os.getenv('CLOUDINARY_API_SECRET'),
 }
 
 # CLOUDINARY_URL="cloudinary://182524473781918:udV9dubqDNy85tPMt8YZTRmcLd8@dgkohtwix"
@@ -141,4 +142,26 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")  # For user-uploaded files
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
+# Custom user model
+AUTH_USER_MODEL = 'members.Member'
+
+# Login/Logout URLs
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Admin customization
+ADMIN_SITE_HEADER = "MicroTrust Administration"
+ADMIN_SITE_TITLE = "MicroTrust Admin"
+ADMIN_INDEX_TITLE = "Welcome to MicroTrust Administration"
+
+# Date and number formatting
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = ','
+DECIMAL_SEPARATOR = '.'
+
+# File upload settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB

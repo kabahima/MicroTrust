@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - MicroTrust{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- Profile Card -->
+        <div class="card shadow mb-4">
+            <div class="card-body text-center">
+                {% if member.profile_picture %}
+                    <img src="{{ member.profile_picture.url }}" alt="{{ member.username }}" 
+                         class="rounded-circle mb-3" width="150" height="150">
+                {% else %}
+                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                         style="width: 150px; height: 150px;">
+                        <i class="fas fa-user fa-4x text-white"></i>
+                    </div>
+                {% endif %}
+                
+                <h4>{{ member.get_full_name|default:member.username }}</h4>
+                <p class="text-muted">@{{ member.username }}</p>
+                
+                {% if member.is_approved %}
+                    <span class="badge bg-success mb-3">Approved Member</span>
+                {% else %}
+                    <span class="badge bg-warning mb-3">Pending Approval</span>
+                {% endif %}
+                
+                <div class="d-grid">
+                    <a href="{% url 'members:profile_edit' %}" class="btn btn-primary mb-2">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'members:account_card' %}" class="btn btn-outline-info">
+                        <i class="fas fa-credit-card me-2"></i>Print Account Card
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card shadow">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Stats</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 border-end">
+                        <h5 class="text-primary">${{ accounts.first.balance|default:"0.00" }}</h5>
+                        <small class="text-muted">Balance</small>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="text-success">${{ accounts.first.shares_balance|default:"0.00" }}</h5>
+                        <small class="text-muted">Shares</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Personal Information -->
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Personal Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>Full Name:</th>
+                                <td>{{ member.get_full_name|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Username:</th>
+                                <td>{{ member.username }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email:</th>
+                                <td>{{ member.email|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Phone:</th>
+                                <td>{{ member.phone_number }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th>Account Number:</th>
+                                <td>{{ member.account_number }}</td>
+                            </tr>
+                            <tr>
+                                <th>National ID:</th>
+                                <td>{{ member.national_id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Member Since:</th>
+                                <td>{{ member.date_joined|date:"M d, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Login:</th>
+                                <td>{{ member.last_login|date:"M d, Y H:i"|default:"Never" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Address:</h6>
+                        <p class="text-muted">{{ member.address }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Account Information</h6>
+            </div>
+            <div class="card-body">
+                {% for account in accounts %}
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6>{{ account.name }}</h6>
+                                <p class="mb-1"><strong>Account Number:</strong> {{ account.account_number }}</p>
+                                <p class="mb-1"><strong>Type:</strong> {{ account.account_type.name|default:"Standard" }}</p>
+                                <p class="mb-0"><strong>Created:</strong> {{ account.created_at|date:"M d, Y" }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <h5 class="text-primary">${{ account.balance }}</h5>
+                                <small class="text-muted">Current Balance</small>
+                                <br>
+                                <h6 class="text-success mt-2">${{ account.shares_balance }}</h6>
+                                <small class="text-muted">Shares Value</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fas fa-exclamation-triangle fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No accounts found. Please contact administrator.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Next of Kin -->
+        {% if next_of_kin %}
+        <div class="card shadow">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Next of Kin</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for kin in next_of_kin %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>{{ kin.name }}</h6>
+                                <p class="mb-1"><strong>Relationship:</strong> {{ kin.relationship|default:"-" }}</p>
+                                <p class="mb-1"><strong>Phone:</strong> {{ kin.phone_number|default:"-" }}</p>
+                                <p class="mb-0"><strong>District:</strong> {{ kin.district|default:"-" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

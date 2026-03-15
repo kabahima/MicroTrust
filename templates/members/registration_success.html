@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Registration Successful - MicroTrust{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-5x text-success"></i>
+                </div>
+                
+                <h2 class="text-success mb-4">Registration Successful!</h2>
+                
+                <p class="lead mb-4">
+                    Thank you for joining MicroTrust. Your account has been created successfully.
+                </p>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>What's Next?</strong><br>
+                    Your account is currently pending approval. You will receive a notification once your account has been reviewed and approved by our team.
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Important Information:</h5>
+                    <ul class="list-unstyled text-start">
+                        <li><i class="fas fa-clock text-warning me-2"></i>Account approval typically takes 1-2 business days</li>
+                        <li><i class="fas fa-envelope text-info me-2"></i>You will receive an email confirmation once approved</li>
+                        <li><i class="fas fa-phone text-primary me-2"></i>Our team may contact you for verification</li>
+                        <li><i class="fas fa-shield-alt text-success me-2"></i>Your information is secure and confidential</li>
+                    </ul>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In to Your Account
+                    </a>
+                    <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>Back to Home
+                    </a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="text-muted">
+                    <small>
+                        <i class="fas fa-question-circle me-1"></i>
+                        Need help? Contact us at <a href="mailto:support@microtrust.com">support@microtrust.com</a>
+                        or call <a href="tel:+1234567890">+123 456 7890</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

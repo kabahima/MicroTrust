@@ -59,10 +59,11 @@ class Loan(models.Model):
         self.fines.add(fine)
 
     def remaining_balance(self):
-        """Calculate the remaining balance by deducting all repayments from loan amount."""
+        """Calculate the remaining balance including interest and fines, minus repayments."""
+        total_loan_with_interest = self.calculate_total_repayment()
         total_repaid = sum([repayment.amount_paid for repayment in self.repayments.all()])
-        total_fines = sum([fine.amount for fine in self.fines.filter(is_paid=False)])
-        return self.approved_amount - total_repaid + total_fines
+        total_unpaid_fines = sum([fine.amount for fine in self.fines.filter(is_paid=False)])
+        return total_loan_with_interest + total_unpaid_fines - total_repaid
 
     remaining_balance.short_description = 'Remaining Balance'
    

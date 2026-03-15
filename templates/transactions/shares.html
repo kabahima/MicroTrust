@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Buy Shares - MicroTrust{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Purchase Shares
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <!-- Account Info -->
+                <div class="alert alert-info">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Member:</strong> {{ user.get_full_name|default:user.username }}<br>
+                            <strong>Account Number:</strong> {{ user.account_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Current Shares:</strong> ${{ user.accounts.first.shares_balance|default:"0.00" }}<br>
+                            <strong>Member Status:</strong> 
+                            {% if user.is_approved %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending Approval</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if not user.is_approved %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Your account is pending approval. Share purchases may be restricted.
+                </div>
+                {% endif %}
+
+                <!-- Share Information -->
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-info-circle me-2"></i>Share Information
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p><strong>Share Price:</strong> $1.00 per share</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p><strong>Minimum Purchase:</strong> $10.00</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p><strong>Annual Dividend:</strong> 5-8%</p>
+                            </div>
+                        </div>
+                        <p class="mb-0 text-muted">
+                            <small>Shares represent your ownership in the cooperative and entitle you to dividends and voting rights.</small>
+                        </p>
+                    </div>
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="amount" class="form-label">
+                                <i class="fas fa-dollar-sign me-2"></i>Share Purchase Amount *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="amount" name="amount" 
+                                       step="1.00" min="10.00" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid amount (minimum $10.00).
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">
+                                Number of shares: <span id="share-count">0</span>
+                            </small>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="payment_method" class="form-label">
+                                <i class="fas fa-credit-card me-2"></i>Payment Method
+                            </label>
+                            <select class="form-select" id="payment_method" name="payment_method">
+                                <option value="cash">Cash</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="mobile_money">Mobile Money</option>
+                                <option value="account_deduction">Deduct from Account Balance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">
+                            <i class="fas fa-comment me-2"></i>Notes (Optional)
+                        </label>
+                        <textarea class="form-control" id="notes" name="notes" 
+                                  rows="3" placeholder="Enter any additional notes..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Purchase Summary</h6>
+                                    <p class="mb-1"><strong>Purchase Amount:</strong> $<span id="summary-amount">0.00</span></p>
+                                    <p class="mb-1"><strong>Number of Shares:</strong> <span id="summary-shares">0</span></p>
+                                    <p class="mb-1"><strong>Current Shares Value:</strong> ${{ user.accounts.first.shares_balance|default:"0.00" }}</p>
+                                    <p class="mb-0"><strong>Total Shares Value:</strong> $<span id="total-shares">{{ user.accounts.first.shares_balance|default:"0.00" }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-info btn-lg">
+                                    <i class="fas fa-chart-pie me-2"></i>Purchase Shares
+                                </button>
+                                <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Share History -->
+        <div class="card shadow mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Share Purchase History
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Shares</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for share in user.member_shares.all|slice:":5" %}
+                            <tr>
+                                <td>{{ share.date_purchased|date:"M d, Y H:i" }}</td>
+                                <td>${{ share.amount }}</td>
+                                <td>{{ share.amount|floatformat:0 }}</td>
+                                <td><span class="badge bg-success">Completed</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    No share purchases found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const amountInput = document.getElementById('amount');
+    const summaryAmount = document.getElementById('summary-amount');
+    const shareCount = document.getElementById('share-count');
+    const summaryShares = document.getElementById('summary-shares');
+    const totalShares = document.getElementById('total-shares');
+    const currentSharesValue = {{ user.accounts.first.shares_balance|default:"0.00" }};
+
+    amountInput.addEventListener('input', function() {
+        const amount = parseFloat(this.value) || 0;
+        const shares = Math.floor(amount); // $1 per share
+        
+        summaryAmount.textContent = amount.toFixed(2);
+        shareCount.textContent = shares;
+        summaryShares.textContent = shares;
+        totalShares.textContent = (currentSharesValue + amount).toFixed(2);
+    });
+
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %}
